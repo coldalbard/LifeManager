@@ -1,5 +1,5 @@
-from PyQt6.Widgets import (QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QListWidget, QListWidgetItem, QLineEdit)
-from database.database import get_connection
+from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QListWidget, QListWidgetItem, QLineEdit)
+from LifeManager.database.database import get_connection
 
 
 class ToDoApp(QWidget):
