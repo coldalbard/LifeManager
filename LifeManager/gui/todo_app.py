@@ -23,6 +23,11 @@ class ToDoApp(QWidget):
         buttons.addWidget(self.done_btn)
         buttons.addWidget(self.del_btn)
 
+        self.search_input = QLineEdit()
+        self.search_input.setPlaceholderText("Поиск по задачам...")
+        self.search_input.textChanged.connect(self.load_tasks)
+        self.layout.addWidget(self.search_input)
+
         self.layout.addLayout(buttons)
         self.setLayout(self.layout)
         self.date_input = QDateTimeEdit(QDateTime.currentDateTime())
@@ -30,16 +35,19 @@ class ToDoApp(QWidget):
 
         self.load_tasks()
 
-
         self.add_btn.clicked.connect(self.add_task)
         self.done_btn.clicked.connect(self.mark_done)
         self.del_btn.clicked.connect(self.delete_task)
 
     def load_tasks(self):
         self.task_list.clear()
+        keyword = self.search_input.text()
         with get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT id, title, is_done, due_date FROM tasks")
+            if keyword:
+                cursor.execute("SELECT id, title, is_done, due_date FROM tasks WHERE title LIKE ?", ('%' + keyword + '%',))
+            else:
+                cursor.execute("SELECT id, title, is_done, due_date FROM tasks")
             for task_id, title, is_done, due in cursor.fetchall():
                 display = f"{title} - до {due}" if due else title
                 item = QListWidgetItem(display)
