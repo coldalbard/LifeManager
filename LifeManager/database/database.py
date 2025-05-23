@@ -12,6 +12,9 @@ def init_db():
         CREATE TABLE IF NOT EXISTS tasks (
                        id INTEGER PRIMARY KEY AUTOINCREMENT,
                        title TEXT NOT NULL,
-                       is_done INTEGER DEFAULT 0)""")
+                       is_done INTEGER DEFAULT 0,
+                       due_date TEXT,
+                       created_at TEXT DEFAULT CURRENT_TIMESTAMP
+                       )""")
         conn.commit()
 

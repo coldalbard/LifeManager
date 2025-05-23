@@ -1,5 +1,5 @@
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QListWidget, QListWidgetItem, QLineEdit)
-from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QListWidget, QListWidgetItem, QLineEdit, QDateTimeEdit)
+from PyQt6.QtCore import Qt, QDateTime
 from LifeManager.database.database import get_connection
 
 
@@ -25,21 +25,24 @@ class ToDoApp(QWidget):
 
         self.layout.addLayout(buttons)
         self.setLayout(self.layout)
+        self.date_input = QDateTimeEdit(QDateTime.currentDateTime())
+        self.layout.addWidget(self.date_input)
 
         self.load_tasks()
+
 
         self.add_btn.clicked.connect(self.add_task)
         self.done_btn.clicked.connect(self.mark_done)
         self.del_btn.clicked.connect(self.delete_task)
 
-
     def load_tasks(self):
         self.task_list.clear()
         with get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT id, title, is_done FROM tasks")
-            for task_id, title, is_done in cursor.fetchall():
-                item = QListWidgetItem(title)
+            cursor.execute("SELECT id, title, is_done, due_date FROM tasks")
+            for task_id, title, is_done, due in cursor.fetchall():
+                display = f"{title} - до {due}" if due else title
+                item = QListWidgetItem(display)
                 item.setData(1000, task_id)
                 if is_done:
                     item.setCheckState(Qt.CheckState.Checked)
@@ -49,6 +52,7 @@ class ToDoApp(QWidget):
 
     def add_task(self):
         title = self.task_input.text()
+        due = self.date_input.dateTime().toString("yyyy-MM-dd HH:mm")
         if title.strip():
             with get_connection() as conn:
                 conn.execute("INSERT INTO tasks (title) VALUES (?)", (title,))
