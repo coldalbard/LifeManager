@@ -22,6 +22,11 @@ class ToDoApp(QWidget):
         buttons.addWidget(self.done_btn)
         buttons.addWidget(self.del_btn)
 
+        self.layout.addLayout(buttons)
+        self.setLayout(self.layout)
+
+        self.load_tasks()
+
         self.add_btn.clicked.connect(self.add_task)
         self.done_btn.clicked.connect(self.mark_done)
         self.done_btn.clicked.connect(self.delete_task)
@@ -42,7 +47,7 @@ class ToDoApp(QWidget):
                 self.task_list.addItem(item)
 
 
-    def mark_done(self):
+    def add_task(self):
         title = self.task_input.text()
         if title.strip():
             with get_connection() as conn:
