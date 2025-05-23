@@ -1,4 +1,5 @@
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QListWidget, QListWidgetItem, QLineEdit)
+from PyQt6.QtCore import Qt
 from LifeManager.database.database import get_connection
 
 
@@ -29,7 +30,7 @@ class ToDoApp(QWidget):
 
         self.add_btn.clicked.connect(self.add_task)
         self.done_btn.clicked.connect(self.mark_done)
-        self.done_btn.clicked.connect(self.delete_task)
+        self.del_btn.clicked.connect(self.delete_task)
 
 
     def load_tasks(self):
@@ -41,11 +42,10 @@ class ToDoApp(QWidget):
                 item = QListWidgetItem(title)
                 item.setData(1000, task_id)
                 if is_done:
-                    item.setCheckState(2)
+                    item.setCheckState(Qt.CheckState.Checked)
                 else:
-                    item.setCheckState(0)
+                    item.setCheckState(Qt.CheckState.Unchecked)
                 self.task_list.addItem(item)
-
 
     def add_task(self):
         title = self.task_input.text()
@@ -55,7 +55,6 @@ class ToDoApp(QWidget):
                 self.task_input.clear()
                 self.load_tasks()
 
-
     def mark_done(self):
         selected = self.task_list.currentItem()
         if selected:
@@ -64,12 +63,11 @@ class ToDoApp(QWidget):
                 conn.execute("UPDATE tasks SET is_done = 1 WHERE id = ?", (task_id,))
             self.load_tasks()
 
-
     def delete_task(self):
         selected = self.task_list.currentItem()
         if selected:
             task_id = selected.data(1000)
             with get_connection() as conn:
                 conn.execute("DELETE FROM tasks WHERE id = ?", (task_id,))
+                conn.commit()
             self.load_tasks()
-

@@ -15,4 +15,3 @@ def init_db():
                        is_done INTEGER DEFAULT 0)""")
         conn.commit()
 
-
